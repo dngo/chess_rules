@@ -31,6 +31,12 @@ describe ChessRules::Chess do
       expect(chess).to be_valid
     end
 
+    it "has invalid row" do
+      chess = ChessRules::Chess.new('3r3k/ppp4p/6p1/8/2B6/1P2p1q1/P1Qb4/1K6 w - - 0 30')
+      expect(chess).to_not be_valid
+      expect(chess.errors[:position]).to include("row has 9 columns, 8 required for each row")
+    end
+
     it "is missing fields" do
       chess = ChessRules::Chess.new("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq -") #missing half move and move num
       expect(chess).to_not be_valid

@@ -49,7 +49,7 @@ module ChessRules
           end
         end
 
-        chess.errors[:position] = "only #{sum_columns} columns, 8 required for each row" unless sum_columns == Board::BOARD_SIZE 
+        chess.errors[:position] = "row has #{sum_columns} columns, 8 required for each row" unless sum_columns == Board::BOARD_SIZE 
       end
 
       if chess.errors.empty? #if there are already validation errors not need to validate further
