@@ -17,6 +17,7 @@ module ChessRules
   START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   WHITE = 'w'
   BLACK = 'b'
+  COLORS = [WHITE, BLACK]
   WHITE_PIECES = %w(P R N B Q K)
   BLACK_PIECES = %w(p r n b q k)
   PIECES = WHITE_PIECES + BLACK_PIECES

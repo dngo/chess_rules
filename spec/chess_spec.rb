@@ -104,7 +104,7 @@ describe ChessRules::Chess do
     it "board string invalid column is short" do
       chess = ChessRules::Chess.new("rnbqkb/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R c Kk - 1 2") #1st row only has 6 columns
       expect(chess).to_not be_valid
-      expect(chess.errors[:position]).to include("only 6 columns, 8 required for each row")
+      expect(chess.errors[:position]).to include("row has 6 columns, 8 required for each row")
     end
 
     it "board string invalid column consecutive numbers" do
