@@ -12,6 +12,9 @@ module ChessRules
       chess.errors[:base] = "FEN string must contain six space delimited fields" unless tokens.count == 6
       chess.errors[:invalid_position] = 'no black king' unless position.include?("k")
       chess.errors[:invalid_position] = 'no white king' unless position.include?("K")
+      chess.errors[:invalid_position] = 'more than 1 white king' if position.count("K") > 1
+      chess.errors[:invalid_position] = 'more than 1 black king' if position.count("k") > 1
+
       chess.errors[:half_move] = "must be a positive integer" unless is_number?(half_move) && half_move.to_i >= 0
       chess.errors[:move_num] = "must be a positive integer" unless is_number?(move_num) && move_num.to_i >= 0
 

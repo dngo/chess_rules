@@ -31,6 +31,13 @@ describe ChessRules::Chess do
       expect(chess).to be_valid
     end
 
+    it "more than 1 white king and more than 1 black king" do
+      chess = ChessRules::Chess.new('rnbq1bkk/pppppppp/8/8/8/8/PPPPPPPP/RNBQ1BKK b - - 0 1')
+      expect(chess).to_not be_valid
+      expect(chess.errors[:invalid_position]).to include("more than 1 white king")
+      expect(chess.errors[:invalid_position]).to include("more than 1 black king")
+    end
+
     it "has invalid row" do
       chess = ChessRules::Chess.new('3r3k/ppp4p/6p1/8/2B6/1P2p1q1/P1Qb4/1K6 w - - 0 30')
       expect(chess).to_not be_valid

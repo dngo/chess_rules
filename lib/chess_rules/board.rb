@@ -24,7 +24,7 @@ module ChessRules
     #we check for attack using pieces of the same color
     #place a piece of each type onto the square
     #if it can attack any opponents piece from the square, inversely an opponent piece of the same type can attack the square
-    #this is faster than looping through all the opponents pieces and 
+    #this is faster than looping through all the opponents pieces and
     #seeing if they can attack this square, since this is only 5 piece checks
     #its faster as long as the opponent has more than 5 pieces left
     def attacked?(attacker_color, coordinate)
@@ -58,12 +58,12 @@ module ChessRules
     end
 
     def place_piece(piece, rank, file)
-      return false unless ChessRules::PIECES.include?(piece) #check for piece 
+      return false unless ChessRules::PIECES.include?(piece) #check for piece
 
       if piece == "K"
-        return false if find_piece('K').present? #don't let the user place more than 1 white king 
+        return false if find_piece('K').present? #don't let the user place more than 1 white king
       elsif piece == "k"
-        return false if find_piece('k').present? #don't let the user place more than 1 black king 
+        return false if find_piece('k').present? #don't let the user place more than 1 black king
       end
 
       board_2d[rank][file] = piece
@@ -113,7 +113,7 @@ module ChessRules
         chars.each.with_index do |char, file|
           if char
             if empty > 0
-              fen += empty.to_s 
+              fen += empty.to_s
               empty = 0
             end
             fen += char
@@ -123,7 +123,7 @@ module ChessRules
 
           if file == 7 #last file
             if empty > 0
-              fen += empty.to_s 
+              fen += empty.to_s
               empty = 0
             end
             fen += "/" unless rank == 7 && file == 7
