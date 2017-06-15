@@ -132,6 +132,12 @@ describe ChessRules::Chess do
       expect(chess.errors[:invalid_position]).to include("there cannot be a pawn on black's promotion row")
     end
 
+    it "when row has too many chars" do
+      chess = ChessRules::Chess.new("r4rk1/1p2b1pp/1qn1pp1n/pN1p4/B2P4/PP2PPP1/2P2Q1P/R3K1Nbb Q KQkq 0 1") #last row has 9
+      expect(chess).to_not be_valid
+      expect(chess.errors[:position]).to include("row has 9 columns, 8 required for each row")
+    end
+
   end
 
   describe '#in_check?' do

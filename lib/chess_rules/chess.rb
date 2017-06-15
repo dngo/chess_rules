@@ -33,7 +33,7 @@ module ChessRules
         elsif char == "/"
           #do nothing / is a row separator in the fen
         else
-          board.place_piece(char, rank, file)
+          board.place_piece(char, rank, file) unless file > 7 || rank > 7
           file += 1
         end
         if file == Board::BOARD_SIZE #increment rank and reset file

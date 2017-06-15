@@ -29,7 +29,7 @@ module ChessRules
       chess.errors[:position] = "must have 8 rows" unless rows.count == Board::BOARD_SIZE
 
       rows.each do |row|
-        sum_columns = 0;
+        sum_columns = 0
         previous_was_number = false
 
         row.each_char do |char|
