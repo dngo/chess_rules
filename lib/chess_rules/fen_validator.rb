@@ -9,24 +9,24 @@ module ChessRules
       tokens = chess.fen.split(/\s+/)
       position, move_color, castling, en_passant, half_move, move_num = tokens
 
-      chess.errors[:base] = "FEN string must contain six space delimited fields" unless tokens.count == 6
-      chess.errors[:invalid_position] = 'no black king' unless position.include?("k")
-      chess.errors[:invalid_position] = 'no white king' unless position.include?("K")
-      chess.errors[:invalid_position] = 'more than 1 white king' if position.count("K") > 1
-      chess.errors[:invalid_position] = 'more than 1 black king' if position.count("k") > 1
+      chess.errors.add(:base, "FEN string must contain six space delimited fields") unless tokens.count == 6
+      chess.errors.add(:invalid_position, "no black king") unless position.include?("k")
+      chess.errors.add(:invalid_position, "no white king") unless position.include?("K")
+      chess.errors.add(:invalid_position, "more than 1 white king") if position.count("K") > 1
+      chess.errors.add(:invalid_position, "more than 1 black king") if position.count("k") > 1
 
-      chess.errors[:half_move] = "must be a positive integer" unless is_number?(half_move) && half_move.to_i >= 0
-      chess.errors[:move_num] = "must be a positive integer" unless is_number?(move_num) && move_num.to_i >= 0
+      chess.errors.add(:half_move, "must be a positive integer") unless is_number?(half_move) && half_move.to_i >= 0
+      chess.errors.add(:move_num, "must be a positive integer") unless is_number?(move_num) && move_num.to_i >= 0
 
-      chess.errors[:en_passant_invalid] = "square is invalid" unless /^(-|[abcdefgh][36])$/.match(tokens[3])
-      chess.errors[:en_passant_invalid] = "the white pawn has just moved, it cannot be whites turn" if en_passant && en_passant.include?("3") && move_color == "w"
-      chess.errors[:en_passant_invalid] = "the black pawn has just moved, it cannot be blacks turn" if en_passant && en_passant.include?("6") && move_color == "b"
+      chess.errors.add(:en_passant_invalid, "square is invalid") unless /^(-|[abcdefgh][36])$/.match(tokens[3])
+      chess.errors.add(:en_passant_invalid, "the white pawn has just moved, it cannot be whites turn") if en_passant && en_passant.include?("3") && move_color == "w"
+      chess.errors.add(:en_passant_invalid, "the black pawn has just moved, it cannot be blacks turn") if en_passant && en_passant.include?("6") && move_color == "b"
 
-      chess.errors[:castling] = "string is invalid" unless /^(KQ?k?q?|Qk?q?|kq?|q|-)$/.match(castling)
-      chess.errors[:move_color] = "must be w or b" unless /^(w|b)$/.match(move_color)
+      chess.errors.add(:castling, "string is invalid") unless /^(KQ?k?q?|Qk?q?|kq?|q|-)$/.match(castling)
+      chess.errors.add(:move_color, "must be w or b") unless /^(w|b)$/.match(move_color)
 
       rows = position.split('/')
-      chess.errors[:position] = "must have 8 rows" unless rows.count == Board::BOARD_SIZE
+      chess.errors.add(:position, "must have 8 rows") unless rows.count == Board::BOARD_SIZE
 
       rows.each do |row|
         sum_columns = 0
@@ -35,7 +35,7 @@ module ChessRules
         row.each_char do |char|
           if is_number?(char)
             if previous_was_number
-              chess.errors[:position] = "is invalid: consecutive numbers #{char}"
+              chess.errors.add(:position, "is invalid: consecutive numbers #{char}")
               break
             else
               previous_was_number = true
@@ -43,7 +43,7 @@ module ChessRules
             end
           else
             unless /^[prnbqkPRNBQK]$/.match(char)
-              chess.errors[:position] = "invalid piece #{char}"
+              chess.errors.add(:position, "invalid piece #{char}")
               break
             else
               sum_columns += 1
@@ -52,7 +52,7 @@ module ChessRules
           end
         end
 
-        chess.errors[:position] = "row has #{sum_columns} columns, 8 required for each row" unless sum_columns == Board::BOARD_SIZE
+        chess.errors.add(:position, "row has #{sum_columns} columns, 8 required for each row") unless sum_columns == Board::BOARD_SIZE
       end
 
       if chess.errors.empty? #if there are already validation errors not need to validate further
