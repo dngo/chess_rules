@@ -123,13 +123,13 @@ describe ChessRules::Chess do
     it "when pawn is on the promotion row 1" do
       chess = ChessRules::Chess.new("P3k3/8/8/8/8/8/8/4K3 w - - 0 1") #pawn on a8
       expect(chess).to_not be_valid
-      expect(chess.errors[:invalid_position]).to include("there cannot be a pawn on white's promotion row")
+      expect(chess.errors[:invalid_position]).to include("there cannot be a pawn on black's promotion row")
     end
 
     it "when pawn is on the promotion row 8" do
       chess = ChessRules::Chess.new("4k3/8/8/8/8/8/8/4K2p w - - 0 1") #pawn on a8
       expect(chess).to_not be_valid
-      expect(chess.errors[:invalid_position]).to include("there cannot be a pawn on black's promotion row")
+      expect(chess.errors[:invalid_position]).to include("there cannot be a pawn on white's promotion row")
     end
 
     it "when row has too many chars" do

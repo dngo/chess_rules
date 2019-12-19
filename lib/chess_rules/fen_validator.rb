@@ -66,9 +66,9 @@ module ChessRules
 
     def validate_pawns(rows)
       if rows.first.include?("p") || rows.first.include?("P")
-        chess.errors.add(:invalid_position, "there cannot be a pawn on white's promotion row")
-      elsif rows.last.include?("p") || rows.last.include?("P")
         chess.errors.add(:invalid_position, "there cannot be a pawn on black's promotion row")
+      elsif rows.last.include?("p") || rows.last.include?("P")
+        chess.errors.add(:invalid_position, "there cannot be a pawn on white's promotion row")
       end
     end
 
