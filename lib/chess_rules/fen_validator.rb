@@ -22,7 +22,7 @@ module ChessRules
       chess.errors.add(:en_passant_invalid, "the white pawn has just moved, it cannot be whites turn") if en_passant && en_passant.include?("3") && move_color == "w"
       chess.errors.add(:en_passant_invalid, "the black pawn has just moved, it cannot be blacks turn") if en_passant && en_passant.include?("6") && move_color == "b"
 
-      chess.errors.add(:castling, "string is invalid") unless /^(KQ?k?q?|Qk?q?|kq?|q|-)$/.match(castling)
+      chess.errors.add(:castling, "string is invalid") unless castling.split('').all?{|char| %w[K Q k q -].include?(char) }
       chess.errors.add(:move_color, "must be w or b") unless /^(w|b)$/.match(move_color)
 
       rows = position.split('/')
