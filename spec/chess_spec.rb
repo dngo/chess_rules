@@ -272,4 +272,14 @@ describe ChessRules::Chess do
     end
   end
 
+  # describe '#move!' do
+  #   it "works for a king move" do
+  #     chess = ChessRules::Chess.new('k7/8/8/8/8/8/8/K7 w - - 0 1')
+  #     chess.move!("Ka2")
+
+  #     expect(chess.piece_at("a1")).to eql(nil)
+  #     expect(chess.piece_at("a2")).to eql("K")
+  #   end
+  # end
+
 end

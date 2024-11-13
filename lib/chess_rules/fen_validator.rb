@@ -26,7 +26,7 @@ module ChessRules
       chess.errors.add(:move_color, "must be w or b") unless /^(w|b)$/.match(move_color)
 
       rows = position.split('/')
-      chess.errors.add(:position, "must have 8 rows") unless rows.count == Board::BOARD_SIZE
+      chess.errors.add(:position, "must have 8 rows") unless rows.count == BOARD_SIZE
 
       rows.each do |row|
         sum_columns = 0
@@ -52,7 +52,7 @@ module ChessRules
           end
         end
 
-        chess.errors.add(:position, "row has #{sum_columns} columns, 8 required for each row") unless sum_columns == Board::BOARD_SIZE
+        chess.errors.add(:position, "row has #{sum_columns} columns, 8 required for each row") unless sum_columns == BOARD_SIZE
       end
 
       if chess.errors.empty? #if there are already validation errors not need to validate further
@@ -73,9 +73,9 @@ module ChessRules
     end
 
     def validate_check
-      if chess.turn == ChessRules::WHITE && chess.in_check?(ChessRules::BLACK)
+      if chess.turn_color == ChessRules::WHITE && chess.in_check?(ChessRules::BLACK)
         chess.errors.add(:invalid_position, "it cannot be white's turn when black is in check")
-      elsif chess.turn == ChessRules::BLACK && chess.in_check?(ChessRules::WHITE)
+      elsif chess.turn_color == ChessRules::BLACK && chess.in_check?(ChessRules::WHITE)
         chess.errors.add(:invalid_position, "it cannot be black's turn when white is in check")
       end
     end
