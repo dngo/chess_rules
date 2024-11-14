@@ -6,10 +6,11 @@ module ChessRules
     def validate(chess)
       @chess = chess
 
-      tokens = chess.fen.split(/\s+/)
-      position, move_color, castling, en_passant, half_move, move_num = tokens
-
+      tokens = chess.initial_fen.split(/\s+/)
       chess.errors.add(:base, "FEN string must contain six space delimited fields") unless tokens.count == 6
+
+      position, turn_color, castling, en_passant, half_move, move_num = tokens
+
       chess.errors.add(:invalid_position, "no black king") unless position.include?("k")
       chess.errors.add(:invalid_position, "no white king") unless position.include?("K")
       chess.errors.add(:invalid_position, "more than 1 white king") if position.count("K") > 1
@@ -19,11 +20,12 @@ module ChessRules
       chess.errors.add(:move_num, "must be a positive integer") unless is_number?(move_num) && move_num.to_i >= 0
 
       chess.errors.add(:en_passant_invalid, "square is invalid") unless /^(-|[abcdefgh][36])$/.match(tokens[3])
-      chess.errors.add(:en_passant_invalid, "the white pawn has just moved, it cannot be whites turn") if en_passant && en_passant.include?("3") && move_color == "w"
-      chess.errors.add(:en_passant_invalid, "the black pawn has just moved, it cannot be blacks turn") if en_passant && en_passant.include?("6") && move_color == "b"
+      chess.errors.add(:en_passant_invalid, "the white pawn has just moved, it cannot be whites turn") if en_passant && en_passant.include?("3") && turn_color == "w"
+      chess.errors.add(:en_passant_invalid, "the black pawn has just moved, it cannot be blacks turn") if en_passant && en_passant.include?("6") && turn_color == "b"
 
+      castling ||= ''
       chess.errors.add(:castling, "string is invalid") unless castling.split('').all?{|char| %w[K Q k q -].include?(char) }
-      chess.errors.add(:move_color, "must be w or b") unless /^(w|b)$/.match(move_color)
+      chess.errors.add(:turn_color, "must be w or b") unless /^(w|b)$/.match(turn_color)
 
       rows = position.split('/')
       chess.errors.add(:position, "must have 8 rows") unless rows.count == BOARD_SIZE
@@ -73,9 +75,9 @@ module ChessRules
     end
 
     def validate_check
-      if chess.turn_color == ChessRules::WHITE && chess.in_check?(ChessRules::BLACK)
+      if chess.turn_color == WHITE && chess.in_check?(BLACK)
         chess.errors.add(:invalid_position, "it cannot be white's turn when black is in check")
-      elsif chess.turn_color == ChessRules::BLACK && chess.in_check?(ChessRules::WHITE)
+      elsif chess.turn_color == BLACK && chess.in_check?(WHITE)
         chess.errors.add(:invalid_position, "it cannot be black's turn when white is in check")
       end
     end

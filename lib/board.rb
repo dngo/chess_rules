@@ -17,14 +17,26 @@ module ChessRules
     FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
     def initialize(fen = STARTING_FEN)
-      @board_2d = Array.new(RANKS.length) { Array.new(FILES.length) }
-      @turn_color = fen.split(/\s+/)[1]
+      self.board_2d = Array.new(RANKS.length) { Array.new(FILES.length) }
+      self.turn_color = fen.split(/\s+/)[1]
 
       parse_fen(fen)
     end
 
+    def move!(notation)
+      move = MoveFactory.create(notation, self)
+
+      move.from_squares.each_with_index do |from, index|
+        move_from_to!(Board.get_coordinates(from), Board.get_coordinates(move.to_squares[index]), move.promotion)
+      end
+
+      self.turn_color = swap_color(turn_color)
+      move
+    end
+
+
     def clear!
-      @board_2d = Array.new(RANKS.length) { Array.new(FILES.length) }
+      self.board_2d = Array.new(RANKS.length) { Array.new(FILES.length) }
     end
 
     #we check for attack using pieces of the same color
@@ -34,13 +46,13 @@ module ChessRules
     #seeing if they can attack this square, since this is only 5 piece checks
     #its faster as long as the opponent has more than 5 pieces left
     def attacked?(attacker_color, coordinate)
-      piece_chars = attacker_color == ChessRules::WHITE ? ChessRules::BLACK_PIECES : ChessRules::WHITE_PIECES
+      piece_chars = attacker_color == WHITE ? BLACK_PIECES : WHITE_PIECES
       piece_chars.each do |char|
-        piece = Piece.from_char(char, coordinate, board_2d)
+        piece = PieceFactory.create(char, coordinate, board_2d)
         piece.moves.each do |move|
-          if piece.color == ChessRules::WHITE
+          if piece.color == WHITE
             return true if piece.char.downcase == piece_at(move)
-          elsif piece.color == ChessRules::BLACK
+          elsif piece.color == BLACK
             return true if piece.char.upcase == piece_at(move)
           end
         end
@@ -61,12 +73,7 @@ module ChessRules
         raise ArgumentError, "Invalid number of arguments: expected 1 or 2, got #{args.length}"
       end
 
-      return false unless ChessRules::PIECES.include?(piece) #check for piece
-      if piece == "K"
-        return false if find_piece('K').present? #don't let the user place more than 1 white king
-      elsif piece == "k"
-        return false if find_piece('k').present? #don't let the user place more than 1 black king
-      end
+      return false unless PIECES.include?(piece) #check for piece
 
       board_2d[rank][file] = piece
     end
@@ -136,16 +143,6 @@ module ChessRules
       fen
     end
 
-    # TODO check if its promotion
-    # move is made if we find piece for that color, not yet checking whether move is valid
-    def move!(notation)
-      move = ChessRules::MoveFactory.create(notation)
-
-      move.from_to_squares(self).each do |from, to|
-        move_from_to!(Board.get_coordinates(from), Board.get_coordinates(to), move.promotion)
-      end
-    end
-
     def move_from_to(from, to)
       test_board = Marshal.load(Marshal.dump(board_2d)) #the only real way to copy any array, dup and clone still result in references, not true copy
 
@@ -161,8 +158,12 @@ module ChessRules
       board_2d
     end
 
+    def swap_color(color)
+      color == WHITE ? BLACK : WHITE
+    end
 
     protected
+
     def parse_fen(fen)
       position = fen.split(/\s+/)[0]
 

@@ -1,127 +1,147 @@
 require 'spec_helper'
+include ChessRules
 
-describe ChessRules::CastlingMove do
+describe CastlingMove do
   describe '.new' do
-    it "initializes correctly with a notation" do
-      notation = "O-O"
+    context "castling kingside" do
+      it "initializes correctly for white" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1" )
+        board.place_piece("R", "h1" )
 
-      move = ChessRules::CastlingMove.new(notation)
+        move = CastlingMove.new("O-O", board)
 
-      expect(move.notation).to eql("O-O")
-    end
-  end
+        expect(move.san).to eql("O-O")
+        expect(move.color).to eql(board.turn_color)
+        expect(move.symbol).to eql("K")
+        expect(move.from_squares).to eql(["e1", "h1"])
+        expect(move.to_squares).to eql(["g1", "f1"])
+        expect(move.lan).to eql("e1g1")
+      end
 
-  describe '.from_to_squares when castling' do
-    it "returns squares when white is castling kingside" do
-      board = ChessRules::Board.new("8/8/8/8/8/8/8/4K2R w KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O")
+      it "initializes correctly for black" do
+        board = Board.new(EMPTY_FEN_BLACK)
 
-      king_moves, rook_moves = move.from_to_squares(board)
-      king_from, king_to = king_moves
-      rook_from, rook_to = rook_moves
+        board.place_piece("k", "e8" )
+        board.place_piece("r", "h8" )
 
-      expect(king_from).to eql("e1")
-      expect(king_to).to eql("g1")
-      expect(rook_from).to eql("h1")
-      expect(rook_to).to eql("f1")
-    end
+        move = CastlingMove.new("O-O", board)
 
-    it "returns squares when white is castling queenside" do
-      board = ChessRules::Board.new("8/8/8/8/8/8/8/R3K3 w KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O-O")
+        expect(move.san).to eql("O-O")
+        expect(move.color).to eql(board.turn_color)
+        expect(move.symbol).to eql("k")
+        expect(move.from_squares).to eql(["e8", "h8"])
+        expect(move.to_squares).to eql(["g8", "f8"])
+      end
 
-      king_moves, rook_moves = move.from_to_squares(board)
-      king_from, king_to = king_moves
-      rook_from, rook_to = rook_moves
+      it "fails kingside castling when king is out of place" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        expect{ CastlingMove.new("O-O", board) }.to raise_error(CastlingMoveError, "white king not at e1")
 
-      expect(king_from).to eql("e1")
-      expect(king_to).to eql("c1")
-      expect(rook_from).to eql("a1")
-      expect(rook_to).to eql("d1")
-    end
+        board = Board.new(EMPTY_FEN_BLACK)
+        expect{ CastlingMove.new("O-O", board) }.to raise_error(CastlingMoveError, "black king not at e8")
+      end
 
-    it "returns squares when black is castling kingside" do
-      board = ChessRules::Board.new("4k2r/8/8/8/8/8/8/8 b KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O")
+      it "fails king castling when rook is out of place" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1" )
+        expect{ CastlingMove.new("O-O", board) }.to raise_error(CastlingMoveError, "white rook not at h1")
 
-      king_moves, rook_moves = move.from_to_squares(board)
-      king_from, king_to = king_moves
-      rook_from, rook_to = rook_moves
+        board = Board.new(EMPTY_FEN_BLACK)
+        board.place_piece("k", "e8" )
+        expect{ CastlingMove.new("O-O", board) }.to raise_error(CastlingMoveError, "black rook not at h8")
+      end
 
-      expect(king_from).to eql("e8")
-      expect(king_to).to eql("g8")
-      expect(rook_from).to eql("h8")
-      expect(rook_to).to eql("f8")
-    end
+      it "fails when castling squares are not empty for white" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1" )
+        board.place_piece("R", "h1" )
 
-    it "returns squares when black is castling queenside" do
-      board = ChessRules::Board.new("r3k3/8/8/8/8/8/8/8 b KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O-O")
+        board.place_piece("B", "f1" )
 
-      king_moves, rook_moves = move.from_to_squares(board)
-      king_from, king_to = king_moves
-      rook_from, rook_to = rook_moves
+        expect{ CastlingMove.new("O-O", board) }.to raise_error(CastlingMoveError, "f1 square is not empty")
+      end
 
-      expect(king_from).to eql("e8")
-      expect(king_to).to eql("c8")
-      expect(rook_from).to eql("a8")
-      expect(rook_to).to eql("d8")
-    end
+      it "fails when castling squares are not empty for black" do
+        board = Board.new(EMPTY_FEN_BLACK)
+        board.place_piece("k", "e8" )
+        board.place_piece("r", "h8" )
 
-    it "fails white kingside castling when king is out of place" do
-      board = ChessRules::Board.new("8/8/8/8/8/8/8/7R w KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O")
+        board.place_piece("b", "f8" )
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "white king not at e1")
+        expect{ CastlingMove.new("O-O", board) }.to raise_error(CastlingMoveError, "f8 square is not empty")
+      end
     end
 
-    it "fails white king castling when rook is out of place" do
-      board = ChessRules::Board.new("8/8/8/8/8/8/8/4K3 w KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O")
+    context "castling queenside" do
+      it "initializes correctly for white" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1" )
+        board.place_piece("R", "a1" )
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "white rook not at h1")
-    end
+        move = CastlingMove.new("O-O-O", board)
 
-    it "fails white queenside castling when king is out of place" do
-      board = ChessRules::Board.new("8/8/8/8/8/8/8/R34 w KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O-O")
+        expect(move.san).to eql("O-O-O")
+        expect(move.color).to eql(board.turn_color)
+        expect(move.symbol).to eql("K")
+        expect(move.from_squares).to eql(["e1", "a1"])
+        expect(move.to_squares).to eql(["c1", "d1"])
+      end
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "white king not at e1")
-    end
+      it "initializes correctly for black" do
+        board = Board.new(EMPTY_FEN_BLACK)
 
-    it "fails white queenside castling when rook is out of place" do
-      board = ChessRules::Board.new("8/8/8/8/8/8/8/4K3 w KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O-O")
+        board.place_piece("k", "e8" )
+        board.place_piece("r", "a8" )
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "white rook not at a1")
-    end
+        move = CastlingMove.new("O-O-O", board)
 
-    it "fails black kingside castling when king is out of place" do
-      board = ChessRules::Board.new("7r/8/8/8/8/8/8/8 b KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O")
+        expect(move.san).to eql("O-O-O")
+        expect(move.color).to eql(board.turn_color)
+        expect(move.symbol).to eql("k")
+        expect(move.from_squares).to eql(["e8", "a8"])
+        expect(move.to_squares).to eql(["c8", "d8"])
+      end
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "black king not at e8")
-    end
+      it "fails when king is out of place" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("R", "a1" )
+        expect{ CastlingMove.new("O-O-O", board) }.to raise_error(CastlingMoveError, "white king not at e1")
 
-    it "fails black king castling when rook is out of place" do
-      board = ChessRules::Board.new("4k3/8/8/8/8/8/8/8 b KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O")
+        board = Board.new(EMPTY_FEN_BLACK)
+        board.place_piece("r", "a8" )
+        expect{ CastlingMove.new("O-O-O", board) }.to raise_error(CastlingMoveError, "black king not at e8")
+      end
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "black rook not at h8")
-    end
+      it "fails when rook is out of place" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1" )
+        expect{ CastlingMove.new("O-O-O", board) }.to raise_error(CastlingMoveError, "white rook not at a1")
 
-    it "fails black queenside castling when king is out of place" do
-      board = ChessRules::Board.new("r7/8/8/8/8/8/8/8 b KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O-O")
+        board = Board.new(EMPTY_FEN_BLACK)
+        board.place_piece("k", "e8" )
+        expect{ CastlingMove.new("O-O-O", board) }.to raise_error(CastlingMoveError, "black rook not at a8")
+      end
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "black king not at e8")
-    end
+      it "fails when castling squares are not empty for white" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1" )
+        board.place_piece("R", "a1" )
 
-    it "fails black queenside castling when rook is out of place" do
-      board = ChessRules::Board.new("4k3/8/8/8/8/8/8/8 b KQkq - 0 1")
-      move = ChessRules::CastlingMove.new("O-O-O")
+        board.place_piece("B", "b1" )
 
-      expect{ move.from_to_squares(board) }.to raise_error(CastlingMoveError, "black rook not at a8")
+        expect{ CastlingMove.new("O-O-O", board) }.to raise_error(CastlingMoveError, "b1 square is not empty")
+      end
+
+      it "fails when castling squares are not empty for black" do
+        board = Board.new(EMPTY_FEN_BLACK)
+        board.place_piece("k", "e8" )
+        board.place_piece("r", "a8" )
+
+        board.place_piece("b", "b8" )
+
+        expect{ CastlingMove.new("O-O-O", board) }.to raise_error(CastlingMoveError, "b8 square is not empty")
+      end
     end
   end
 end

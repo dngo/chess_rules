@@ -1,9 +1,10 @@
 require 'spec_helper'
+include ChessRules
 
-describe ChessRules::Board do
+describe Board do
   describe '.new' do
     it "default to the starting fen when one is not provided" do
-      board = ChessRules::Board.new
+      board = Board.new
 
       expect(board.board_2d[0]).to eql(["r", "n", "b", "q", "k", "b", "n", "r"])
       expect(board.board_2d[1]).to eql(["p", "p", "p", "p", "p", "p", "p", "p"])
@@ -16,7 +17,7 @@ describe ChessRules::Board do
     end
 
     it "initializes correctly with a fen" do
-      board = ChessRules::Board.new("k7/8/8/8/8/8/8/K7 w - - 0 1")
+      board = Board.new("k7/8/8/8/8/8/8/K7 w - - 0 1")
 
       expect(board.board_2d[0]).to eql ["k", nil, nil, nil, nil, nil, nil, nil]
       expect(board.board_2d[1]).to eql [nil, nil, nil, nil, nil, nil, nil, nil]
@@ -29,7 +30,7 @@ describe ChessRules::Board do
     end
 
     it "initializes correctly for a fen with all empty squares" do
-      board = ChessRules::Board.new(ChessRules::EMPTY_FEN)
+      board = Board.new(EMPTY_FEN_WHITE)
 
       expect(board.board_2d[0]).to eql [nil, nil, nil, nil, nil, nil, nil, nil]
       expect(board.board_2d[1]).to eql [nil, nil, nil, nil, nil, nil, nil, nil]
@@ -44,7 +45,7 @@ describe ChessRules::Board do
 
   describe '.clear!' do
     it "removes all pieces" do
-      board = ChessRules::Board.new(ChessRules::STARTING_FEN)
+      board = Board.new(STARTING_FEN)
 
       expect(board.to_fen).to eql "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 
@@ -55,7 +56,7 @@ describe ChessRules::Board do
   end
 
   describe '#move!' do
-    let(:board) { ChessRules::Board.new(ChessRules::EMPTY_FEN) }
+    let(:board) { Board.new(EMPTY_FEN_WHITE) }
 
     after(:each) do
       board.clear!
@@ -120,7 +121,7 @@ describe ChessRules::Board do
     end
 
     it "works for check" do
-      board =  ChessRules::Board.new('k7/8/8/8/8/8/1Q6/K7 w - - 0 1')
+      board =  Board.new('k7/8/8/8/8/8/1Q6/K7 w - - 0 1')
 
       board.move!("Qb7+")
 
@@ -129,7 +130,7 @@ describe ChessRules::Board do
     end
 
     it "works for checkmate" do
-      board = ChessRules::Board.new("k7/8/8/8/8/8/1Q6/K7 w KQkq - 0 1")
+      board = Board.new("k7/8/8/8/8/8/1Q6/K7 w KQkq - 0 1")
 
       board.move!("Qb7#")
 
@@ -138,7 +139,7 @@ describe ChessRules::Board do
     end
 
     it "works for a disambiguous move" do
-      board = ChessRules::Board.new("R6R/8/8/8/8/8/8/8 w KQkq - 0 1")
+      board = Board.new("R6R/8/8/8/8/8/8/8 w KQkq - 0 1")
 
       board.move!('Rab8')
 
@@ -147,29 +148,29 @@ describe ChessRules::Board do
     end
 
     it "works for promotion" do
-      board = ChessRules::Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
+      board = Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
       board.move!("a8=Q")
       expect(board.piece_at("a7")).to be_nil
       expect(board.piece_at("a8")).to eql("Q")
 
-      board = ChessRules::Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
+      board = Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
       board.move!("a8=Q+") # promotion with check
       expect(board.piece_at("a7")).to be_nil
       expect(board.piece_at("a8")).to eql("Q")
 
-      board = ChessRules::Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
+      board = Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
       board.move!("a8=Q++") # promotion with double check
       expect(board.piece_at("a7")).to be_nil
       expect(board.piece_at("a8")).to eql("Q")
 
-      board = ChessRules::Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
+      board = Board.new("8/P7/8/8/8/8/8/8 w KQkq - 0 1")
       board.move!("a8=Q+") # promotion with checkmate
       expect(board.piece_at("a7")).to be_nil
       expect(board.piece_at("a8")).to eql("Q")
     end
 
     it "fails when the current turn color has no piece matching the notation" do
-      board =  ChessRules::Board.new('8/8/8/8/8/8/8/8 b - - 0 1') # black turn
+      board =  Board.new('8/8/8/8/8/8/8/8 b - - 0 1') # black turn
 
       board.place_piece("K", "a1") # but white king is at origin square
 
@@ -177,7 +178,7 @@ describe ChessRules::Board do
     end
 
     it "fails when the current turn color has no matching piece that can reach the destination square" do
-      board =  ChessRules::Board.new('8/8/8/8/8/8/8/8 b - - 0 1') # black turn
+      board = Board.new('8/8/8/8/8/8/8/8 b - - 0 1') # black turn
 
       board.place_piece("k", "h8") # but white king is at origin square
 

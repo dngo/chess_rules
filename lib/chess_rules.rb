@@ -1,28 +1,31 @@
-require "chess_rules/version"
-require "chess_rules/board"
-require "chess_rules/fen_validator"
-require "chess_rules/chess"
+require "version"
+require "board"
+require "fen_validator"
+require "chess_api"
+require "chess"
 
-require "chess_rules/moves/move_factory"
-require "chess_rules/moves/abstract_move"
-require "chess_rules/moves/castling_move"
-require "chess_rules/moves/disambiguous_move"
-require "chess_rules/moves/standard_move"
-require "chess_rules/moves/pawn_move"
+require "moves/move_factory"
+require "moves/abstract_move"
+require "moves/castling_move"
+require "moves/disambiguous_move"
+require "moves/standard_move"
+require "moves/pawn_move"
 
-require "chess_rules/pieces/piece"
-require "chess_rules/pieces/stepping_piece"
-require "chess_rules/pieces/sliding_piece"
-require "chess_rules/pieces/rook"
-require "chess_rules/pieces/queen"
-require "chess_rules/pieces/bishop"
-require "chess_rules/pieces/king"
-require "chess_rules/pieces/knight"
-require "chess_rules/pieces/pawn"
+require "pieces/piece_factory"
+require "pieces/piece"
+require "pieces/stepping_piece"
+require "pieces/sliding_piece"
+require "pieces/rook"
+require "pieces/queen"
+require "pieces/bishop"
+require "pieces/king"
+require "pieces/knight"
+require "pieces/pawn"
 
 module ChessRules
   STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-  EMPTY_FEN = '8/8/8/8/8/8/8/8 w - - 0 1'
+  EMPTY_FEN_WHITE = '8/8/8/8/8/8/8/8 w - - 0 1'
+  EMPTY_FEN_BLACK = '8/8/8/8/8/8/8/8 b - - 0 1'
   WHITE = 'w'
   BLACK = 'b'
   BOARD_SIZE = 8
@@ -30,7 +33,7 @@ module ChessRules
   WHITE_PIECES = %w(P R N B Q K)
   BLACK_PIECES = %w(p r n b q k)
   PIECES = WHITE_PIECES + BLACK_PIECES
-  PIECE_NAME_MAP = {
+  PIECE_SYMBOL_MAP = {
     "P" => "white pawn",
     "R" => "white rook",
     "N" => "white knight",
