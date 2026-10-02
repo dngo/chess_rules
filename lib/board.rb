@@ -1,6 +1,7 @@
 module ChessRules
   class Board
     attr_accessor :board_2d, :turn_color
+    attr_reader :en_passant_square
 
     #  SQUARE_NAMES = {
     #    a8:   0, b8:   1, c8:   2, d8:   3, e8:   4, f8:   5, g8:   6, h8:   7,
@@ -18,9 +19,17 @@ module ChessRules
 
     def initialize(fen = STARTING_FEN)
       self.board_2d = Array.new(RANKS.length) { Array.new(FILES.length) }
-      self.turn_color = fen.split(/\s+/)[1]
+      tokens = fen.split(/\s+/)
+      self.turn_color = tokens[1]
+      self.en_passant_square = tokens[3] || "-"
 
       parse_fen(fen)
+    end
+
+    def en_passant_square=(square)
+      @en_passant_square = square.nil? || square.empty? ? "-" : square
+      # Pawns only see the piece grid, so keep the target on that array too.
+      board_2d.instance_variable_set(:@en_passant_square, @en_passant_square) if board_2d
     end
 
     def move!(notation)
@@ -31,12 +40,14 @@ module ChessRules
       end
 
       self.turn_color = swap_color(turn_color)
+      self.en_passant_square = move.is_a?(PawnMove) ? (move.en_passant_square || "-") : "-"
       move
     end
 
 
     def clear!
       self.board_2d = Array.new(RANKS.length) { Array.new(FILES.length) }
+      self.en_passant_square = "-"
     end
 
     #we check for attack using pieces of the same color
@@ -146,12 +157,14 @@ module ChessRules
     def move_from_to(from, to)
       test_board = Marshal.load(Marshal.dump(board_2d)) #the only real way to copy any array, dup and clone still result in references, not true copy
 
+      clear_en_passant_pawn(test_board, from, to)
       test_board[to.first][to.last] = test_board[from.first][from.last]
       test_board[from.first][from.last] = nil
       test_board
     end
 
     def move_from_to!(from, to, promotion = nil)
+      clear_en_passant_pawn(board_2d, from, to)
       board_2d[to.first][to.last] = board_2d[from.first][from.last]
       board_2d[to.first][to.last] = promotion if promotion
       board_2d[from.first][from.last] = nil
@@ -189,6 +202,21 @@ module ChessRules
       return if file > 7 || rank > 7
 
       place_piece(char, rank, file)
+    end
+
+    # from and to are [rank, file]. The captured pawn stays on the mover's rank.
+    def clear_en_passant_pawn(squares, from, to)
+      return unless en_passant_capture?(from, to)
+
+      squares[from.first][to.last] = nil
+    end
+
+    def en_passant_capture?(from, to)
+      return false if en_passant_square.nil? || en_passant_square == "-"
+      return false unless Board.get_algebraic(to) == en_passant_square
+
+      piece = board_2d[from.first][from.last]
+      piece.to_s.upcase == "P" && board_2d[to.first][to.last].nil?
     end
 
   end

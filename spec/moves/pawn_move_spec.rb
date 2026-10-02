@@ -65,6 +65,16 @@ describe PawnMove do
   end
 
   describe 'when capturing' do
+    it "returns for an en passant capture" do
+      board = Board.new("4k3/8/8/4Pp2/8/8/8/4K3 w - f6 0 22")
+
+      move = PawnMove.new("exf6", board)
+
+      expect(move.from_squares).to eql(["e5"])
+      expect(move.to_squares).to eql(["f6"])
+      expect(move.captured).to eql("p")
+    end
+
     it "returns for a pawn capture" do
       board = Board.new("8/8/8/8/8/1q6/P7/8 w - - 0 1")
 

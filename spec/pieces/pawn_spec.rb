@@ -37,6 +37,22 @@ describe ::Pawn do
       expect(algebraic_moves).to eql ["d8", "f8", "e8"]
     end
 
+    it "captures en passant onto the empty target square" do
+      board = Board.new("4k3/8/8/4Pp2/8/8/8/4K3 w - f6 0 22")
+      pawn = Pawn.new(Pawn::WHITE, Board.get_coordinates("e5"), board.board_2d)
+      algebraic_moves = pawn.moves.map { |coordinate| Board.get_algebraic(coordinate) }
+
+      expect(algebraic_moves).to include("f6")
+    end
+
+    it "does not capture en passant when no target square is set" do
+      board = Board.new("4k3/8/8/4Pp2/8/8/8/4K3 w - - 0 22")
+      pawn = Pawn.new(Pawn::WHITE, Board.get_coordinates("e5"), board.board_2d)
+      algebraic_moves = pawn.moves.map { |coordinate| Board.get_algebraic(coordinate) }
+
+      expect(algebraic_moves).not_to include("f6")
+    end
+
     it "cannot advance when blocked" do
       chess = Chess.new '8/8/8/8/8/p4K1k/P7/8 b - - 0 1'
       pawn = Pawn.new(::Pawn::WHITE, Board.get_coordinates('a2'), chess.board.board_2d)

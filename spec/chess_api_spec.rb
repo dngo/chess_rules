@@ -104,6 +104,32 @@ describe ChessApi do
       expect(chess.en_passant_square).to eql "-"
     end
 
+    it "plays an en passant capture" do
+      chess = Chess.new("4k3/8/8/8/3p4/8/4P3/4K3 w - - 0 1")
+
+      chess.move!("e4")
+      expect(chess.en_passant_square).to eql("e3")
+
+      chess.move!("dxe3")
+      expect(chess.board.piece_at("e4")).to be_nil
+      expect(chess.board.piece_at("d4")).to be_nil
+      expect(chess.board.piece_at("e3")).to eql("p")
+      expect(chess.en_passant_square).to eql("-")
+    end
+
+    it "plays the en passant capture from a loaded position" do
+      chess = Chess.new("4k3/p1pr1pp1/1p2p3/4P3/4p3/PP2P2P/1BP1KP2/R7 b - - 1 21")
+
+      chess.move!("f5")
+      expect(chess.en_passant_square).to eql("f6")
+
+      chess.move!("exf6")
+      expect(chess.board.piece_at("f5")).to be_nil
+      expect(chess.board.piece_at("e5")).to be_nil
+      expect(chess.board.piece_at("f6")).to eql("P")
+      expect(chess.en_passant_square).to eql("-")
+    end
+
     it "full_moves" do
       chess = Chess.new
 

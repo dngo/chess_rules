@@ -18,7 +18,7 @@ module ChessRules
       ATTACK_DELTA[color].each do |delta|
         rel_pos = self.position
         rel_pos = [rel_pos[0] + delta[0], rel_pos[1] + delta[1]]
-        moves << rel_pos if valid_attack_move?(rel_pos)
+        moves << rel_pos if valid_attack_move?(rel_pos) || en_passant_capture?(rel_pos)
       end
 
       #can move forward 2 if on starting row
@@ -41,6 +41,18 @@ module ChessRules
 
     def valid_attack_move?(pos)
       within_bounds?(pos) && board[pos.first][pos.last] && !own_piece?(pos) #pawn attack
+    end
+
+    # The capture square is empty. The enemy pawn sits on the mover's rank.
+    def en_passant_capture?(pos)
+      target = board.instance_variable_get(:@en_passant_square)
+      return false if target.nil? || target == "-"
+      return false unless within_bounds?(pos)
+      return false unless Board.get_algebraic(pos) == target
+      return false unless board[pos.first][pos.last].nil?
+
+      enemy = color == ChessRules::WHITE ? BLACK : WHITE
+      board[position[0]][pos[1]] == enemy
     end
 
     def valid_move?(pos)

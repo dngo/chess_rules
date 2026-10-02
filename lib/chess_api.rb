@@ -13,6 +13,7 @@ module ChessApi
   end
 
   def move!(san)
+    board.en_passant_square = en_passant_square
     move = board.move!(san)
 
     self.en_passant_square = "-"

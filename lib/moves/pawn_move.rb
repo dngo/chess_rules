@@ -36,6 +36,14 @@ module ChessRules
        turn_color == WHITE ? "P" : "p"
     end
 
+    def get_captured(board, square)
+      piece = super
+      return piece if piece
+      return unless square == board.en_passant_square && board.en_passant_square != "-"
+
+      board.piece_at("#{square[0]}#{from_squares.first[-1]}")
+    end
+
     # rely on StandardMove to remove capture and check, additonally remove promotion notation
     def sanitized_san
       super.split(PROMOTION_NOTATION)[0]
