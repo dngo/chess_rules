@@ -60,8 +60,12 @@ describe MoveFactory do
       board.place_piece("R", "a1")
 
       include_examples 'move creation', "O-O", board, CastlingMove
+      include_examples 'move creation', "O-O+", board, CastlingMove
+      include_examples 'move creation', "O-O#", board, CastlingMove
 
       include_examples 'move creation', "O-O-O", board, CastlingMove
+      include_examples 'move creation', "O-O-O+", board, CastlingMove
+      include_examples 'move creation', "O-O-O#", board, CastlingMove
     end
 
     describe 'for disambiguated moves' do

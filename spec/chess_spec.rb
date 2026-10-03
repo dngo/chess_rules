@@ -377,6 +377,26 @@ describe Chess do
         expect(chess.fen).to eql("8/8/8/8/8/8/8/5RK1 b kq - 1 1") # castling string is updated for white
       end
 
+      it "succeeds when white castles kingside with check" do
+        chess = Chess.new("5k2/8/8/8/8/8/8/4K2R w K - 0 1")
+
+        chess.move!("O-O+")
+
+        expect(chess.piece_at("g1")).to eql("K")
+        expect(chess.piece_at("f1")).to eql("R")
+        expect(chess.in_check?(BLACK)).to be true
+      end
+
+      it "succeeds when black castles kingside with check" do
+        chess = Chess.new("4k2r/8/8/8/8/8/8/5K2 b k - 0 1")
+
+        chess.move!("O-O+")
+
+        expect(chess.piece_at("g8")).to eql("k")
+        expect(chess.piece_at("f8")).to eql("r")
+        expect(chess.in_check?(WHITE)).to be true
+      end
+
       it "succeeds when white castles queenside" do
         chess = Chess.new(EMPTY_FEN_WHITE)
         chess.castling = "KQkq"
@@ -391,6 +411,16 @@ describe Chess do
         expect(chess.piece_at("d1")).to eql("R")
         expect(chess.turn_color).to eql("b")
         expect(chess.castling).to eql("kq") # castling string is updated for white
+      end
+
+      it "succeeds when white castles queenside with check" do
+        chess = Chess.new("3k4/8/8/8/8/8/8/R3K3 w Q - 0 1")
+
+        chess.move!("O-O-O+")
+
+        expect(chess.piece_at("c1")).to eql("K")
+        expect(chess.piece_at("d1")).to eql("R")
+        expect(chess.in_check?(BLACK)).to be true
       end
 
       it "succeeds when black castles kingside" do

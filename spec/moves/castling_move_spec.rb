@@ -19,6 +19,19 @@ describe CastlingMove do
         expect(move.lan).to eql("e1g1")
       end
 
+      it "initializes kingside castling that gives check" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1")
+        board.place_piece("R", "h1")
+
+        move = CastlingMove.new("O-O+", board)
+
+        expect(move.san).to eql("O-O+")
+        expect(move.from_squares).to eql(["e1", "h1"])
+        expect(move.to_squares).to eql(["g1", "f1"])
+        expect(move.lan).to eql("e1g1")
+      end
+
       it "initializes correctly for black" do
         board = Board.new(EMPTY_FEN_BLACK)
 
@@ -86,6 +99,19 @@ describe CastlingMove do
         expect(move.symbol).to eql("K")
         expect(move.from_squares).to eql(["e1", "a1"])
         expect(move.to_squares).to eql(["c1", "d1"])
+      end
+
+      it "initializes queenside castling that gives check" do
+        board = Board.new(EMPTY_FEN_WHITE)
+        board.place_piece("K", "e1")
+        board.place_piece("R", "a1")
+
+        move = CastlingMove.new("O-O-O+", board)
+
+        expect(move.san).to eql("O-O-O+")
+        expect(move.from_squares).to eql(["e1", "a1"])
+        expect(move.to_squares).to eql(["c1", "d1"])
+        expect(move.lan).to eql("e1c1")
       end
 
       it "initializes correctly for black" do

@@ -39,7 +39,8 @@ module ChessRules
     end
 
     def self.castling?(san)
-      [CastlingMove::KING_SIDE, CastlingMove::QUEEN_SIDE].include?(san)
+      bare = san.to_s.gsub(CHECK_NOTATION, "").gsub(CHECKMATE_NOTATION, "")
+      [CastlingMove::KING_SIDE, CastlingMove::QUEEN_SIDE].include?(bare)
     end
   end
 end

@@ -45,9 +45,10 @@ module ChessRules
     def initialize(san, board)
       super(san, board)
 
-      validate_castling(san, board)
+      bare = sanitized_san
+      validate_castling(bare, board)
       @symbol = get_symbol(board.turn_color)
-      @from_squares, @to_squares = MOVES[board.turn_color][san]
+      @from_squares, @to_squares = MOVES[board.turn_color][bare]
     end
 
     private
