@@ -53,7 +53,8 @@ module ChessRules
     def get_promotion(notation)
       return unless san.include?(PROMOTION_NOTATION)
 
-      san.split(PROMOTION_NOTATION).last[0]
+      piece = san.split(PROMOTION_NOTATION).last[0]
+      color == BLACK ? piece.downcase : piece
     end
   end
 end

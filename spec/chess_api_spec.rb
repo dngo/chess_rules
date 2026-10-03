@@ -117,6 +117,20 @@ describe ChessApi do
       expect(chess.en_passant_square).to eql("-")
     end
 
+    it "places a promoted piece in the mover's color" do
+      white = Chess.new("8/4P3/8/8/8/8/8/k7 w - - 0 1")
+      white.move!("e8=Q")
+      expect(white.board.piece_at("e8")).to eql("Q")
+
+      black = Chess.new("8/8/8/8/8/8/4p3/K7 b - - 0 1")
+      black.move!("e1=Q")
+      expect(black.board.piece_at("e1")).to eql("q")
+
+      black.move!("Kb1")
+      black.move!("Qe2")
+      expect(black.board.piece_at("e2")).to eql("q")
+    end
+
     it "plays the en passant capture from a loaded position" do
       chess = Chess.new("4k3/p1pr1pp1/1p2p3/4P3/4p3/PP2P2P/1BP1KP2/R7 b - - 1 21")
 

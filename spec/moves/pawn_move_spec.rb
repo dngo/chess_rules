@@ -48,6 +48,16 @@ describe PawnMove do
       expect(move.san).to eql("e8=Q#")
       expect(move.promotion).to eql("Q")
     end
+
+    it "uses a black piece when black promotes" do
+      board = Board.new("8/8/8/8/8/8/4p3/8 b - - 0 1")
+
+      move = PawnMove.new("e1=Q", board)
+      expect(move.promotion).to eql("q")
+
+      move = PawnMove.new("e1=N+", board)
+      expect(move.promotion).to eql("n")
+    end
   end
 
   describe 'fails when' do
